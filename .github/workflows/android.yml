@@ -14,20 +14,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ☕ Java (necessário pro Android)
+      # ☕ Java
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # 🧠 Instalar Haxe 4.3.7
+      # 📱 Instalar Android SDK
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      # 🔐 Aceitar licenças
+      - name: Accept Licenses
+        run: yes | sdkmanager --licenses
+
+      # 🧠 Haxe
       - name: Setup Haxe
         uses: krdlab/setup-haxe@v1
         with:
           haxe-version: 4.3.7
 
-      # 📦 Instalar libs
+      # 📦 Libs
       - name: Install Haxe Libraries
         run: |
           haxelib install lime
@@ -36,15 +44,20 @@ jobs:
           haxelib install flixel-addons
           haxelib install flixel-ui
 
-      # ⚙️ Setup OpenFL + Android
+      # ⚙️ Setup OpenFL
       - name: Setup OpenFL
         run: |
           haxelib run lime setup
           haxelib run openfl setup
-          haxelib run lime setup android
+
+      # 🧠 EXPORTAR VARIÁVEIS (ESSENCIAL)
+      - name: Set Android Environment Variables
+        run: |
+          echo "ANDROID_SDK=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_NDK_ROOT=$ANDROID_NDK_HOME" >> $GITHUB_ENV
 
       # 📱 Build APK
-      - name: Build Android APK
+      - name: Build APK
         run: |
           haxelib run openfl build android -release
 
