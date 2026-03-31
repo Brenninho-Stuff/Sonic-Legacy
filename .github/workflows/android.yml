@@ -10,28 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 📥 Clonar repositório
-      - name: Checkout
-        uses: actions/checkout@v4
+      # 📥 Checkout
+      - uses: actions/checkout@v4
 
       # ☕ Java
-      - name: Set up Java
-        uses: actions/setup-java@v3
+      - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # 📱 Instalar Android SDK
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      # 📱 Android SDK
+      - uses: android-actions/setup-android@v3
 
-      # 🔐 Aceitar licenças
-      - name: Accept Licenses
-        run: yes | sdkmanager --licenses
+      # 🔐 Licenças + NDK
+      - name: Install Android Dependencies
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2" "ndk;25.2.9519653"
 
       # 🧠 Haxe
-      - name: Setup Haxe
-        uses: krdlab/setup-haxe@v1
+      - uses: krdlab/setup-haxe@v1
         with:
           haxe-version: 4.3.7
 
@@ -44,26 +42,23 @@ jobs:
           haxelib install flixel-addons
           haxelib install flixel-ui
 
-      # ⚙️ Setup OpenFL
-      - name: Setup OpenFL
+      # ⚙️ Setup Lime/OpenFL (FORÇADO)
+      - name: Setup Lime
         run: |
           haxelib run lime setup
-          haxelib run openfl setup
+          mkdir -p ~/.lime
+          echo '<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <android sdk="$ANDROID_HOME" ndk="$ANDROID_HOME/ndk/25.2.9519653" />
+</project>' > ~/.lime/config.xml
 
-      # 🧠 EXPORTAR VARIÁVEIS (ESSENCIAL)
-      - name: Set Android Environment Variables
-        run: |
-          echo "ANDROID_SDK=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "ANDROID_NDK_ROOT=$ANDROID_NDK_HOME" >> $GITHUB_ENV
-
-      # 📱 Build APK
+      # 📱 Build
       - name: Build APK
         run: |
           haxelib run openfl build android -release
 
-      # 📤 Upload APK
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      # 📤 Upload
+      - uses: actions/upload-artifact@v4
         with:
           name: SonicLegacy-APK
-          path: export/android/bin/app/build/outputs/apk/debug/*.apk
+          path: export/android/bin/app/build/outputs/apk/release/*.apk
