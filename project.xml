@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+
+    <!-- ================= APP ================= -->
+    <app 
+        title="Sonic Legacy"
+        file="SonicLegacy"
+        main="Main"
+        version="1.0.0"
+        company="SonicLegacyTeam" 
+    />
+
+    <!-- ================= WINDOW ================= -->
+    <window 
+        width="1280" 
+        height="720" 
+        fps="60" 
+        background="#000000"
+        vsync="true"
+    />
+
+    <!-- ================= PATHS ================= -->
+    <source path="source" />
+    <assets path="assets" />
+
+    <!-- ================= LIBS ================= -->
+    <haxelib name="openfl" />
+    <haxelib name="lime" />
+    <haxelib name="flixel" />
+    <haxelib name="flixel-addons" />
+    <haxelib name="flixel-ui" />
+
+    <!-- ================= DEFINES ================= -->
+    <define name="FLX_NO_MOUSE" if="mobile" />
+    <define name="mobile" if="android" />
+    <define name="mobile" if="ios" />
+
+    <!-- ================= ICON ================= -->
+    <icon path="arts/icon.png" />
+
+    <!-- ================= TARGETS ================= -->
+    <set name="android" if="android" />
+    <set name="windows" if="windows" />
+    <set name="html5" if="html5" />
+
+</project>
