@@ -1,0 +1,56 @@
+name: Android Build - Sonic Legacy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 📥 Clonar repositório
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # ☕ Java (necessário pro Android)
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 🧠 Instalar Haxe 4.3.7
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: 4.3.7
+
+      # 📦 Instalar libs
+      - name: Install Haxe Libraries
+        run: |
+          haxelib install lime
+          haxelib install openfl
+          haxelib install flixel
+          haxelib install flixel-addons
+          haxelib install flixel-ui
+
+      # ⚙️ Setup OpenFL + Android
+      - name: Setup OpenFL
+        run: |
+          haxelib run lime setup
+          haxelib run openfl setup
+          haxelib run lime setup android
+
+      # 📱 Build APK
+      - name: Build Android APK
+        run: |
+          haxelib run openfl build android -release
+
+      # 📤 Upload APK
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SonicLegacy-APK
+          path: export/android/bin/app/build/outputs/apk/debug/*.apk
